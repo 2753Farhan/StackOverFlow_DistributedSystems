@@ -14,21 +14,12 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please enter your Email!"],
     validate: [validator.isEmail, "Please provide a valid Email!"],
   },
-  phone: {
-    type: Number,
-    required: [true, "Please enter your Phone Number!"],
-  },
   password: {
     type: String,
     required: [true, "Please provide a Password!"],
     minLength: [8, "Password must contain at least 8 characters!"],
     maxLength: [32, "Password cannot exceed 32 characters!"],
     select: false,
-  },
-  role: {
-    type: String,
-    required: [true, "Please select a role"],
-    enum: ["Normal User", "Admin"],
   },
   createdAt: {
     type: Date,

@@ -36,11 +36,11 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
         {/* Logo */}
         <div className="">
-          <img src="/Logo.png" alt="logo" className="w-52 h-36"  />
+          <img src="/Logo.png" alt="logo" className="w-52 h-36" />
         </div>
 
-        {/* Menu Links */}
-        <ul className={`hidden md:flex space-x-6`}>
+        {/* Menu Links - hidden on small screens */}
+        <ul className="hidden md:flex space-x-6">
           <li>
             <Link
               to={"/"}
@@ -50,18 +50,6 @@ const Navbar = () => {
               HOME
             </Link>
           </li>
-
-          {user && user.role === "Employer" && (
-            <li>
-              <Link
-                to={"/job/post"}
-                onClick={() => setShow(false)}
-                className="hover:text-gray-300"
-              >
-                POST JOB
-              </Link>
-            </li>
-          )}
 
           {/* Logout Button */}
           {isAuthorized && (
@@ -76,7 +64,7 @@ const Navbar = () => {
           )}
         </ul>
 
-        {/* Hamburger Menu Icon */}
+        {/* Hamburger Menu Icon - only visible on mobile */}
         <div className="md:hidden">
           <GiHamburgerMenu
             onClick={() => setShow(!show)}
@@ -85,9 +73,11 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - only visible when 'show' is true */}
       <div
-        className={`md:hidden ${show ? "block" : "hidden"} bg-gray-700 text-white`}
+        className={`md:hidden transition-all duration-300 ${
+          show ? "block" : "hidden"
+        } bg-gray-700 text-white`}
       >
         <ul className="space-y-4 py-4">
           <li>
@@ -99,18 +89,6 @@ const Navbar = () => {
               HOME
             </Link>
           </li>
-
-          {user && user.role === "Employer" && (
-            <li>
-              <Link
-                to={"/job/post"}
-                onClick={() => setShow(false)}
-                className="block px-4 py-2 hover:bg-gray-600"
-              >
-                POST JOB
-              </Link>
-            </li>
-          )}
 
           {isAuthorized && (
             <li>
