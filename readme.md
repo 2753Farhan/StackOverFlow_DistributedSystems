@@ -114,7 +114,43 @@ You can view the demo videos for both versions of the project:
 
 To run the project locally:
 
-### Monolithic Version:
+### Monolithic Version
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/stack-overflow-mono.git
+   ```
+
+2. Navigate to the monolithic version:
+   ```bash
+   cd stack-overflow-mono
+   ```
+
+3. Install dependencies:
+   ```bash
+   npm install # or pip install -r requirements.txt for Python
+   ```
+
+4. Run the application:
+   ```bash
+   npm start
+   ```
+
+### Microservices Version
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/stack-overflow-microservices.git
+   ```
+
+2. Navigate to each service directory and install dependencies:
+   ```bash
+   cd user-service && npm install
+   cd post-service && npm install
+   cd notification-service && npm install
+   ```
+
+3. Start each service:
+   ```bash
+   npm start
+   ```
