@@ -30,6 +30,9 @@ The system architecture includes both a client (UI) and a server (backend). The 
 
 ## Part 1: Monolithic Architecture
 
+![image](https://github.com/user-attachments/assets/36aeb478-99ba-4b06-9e0d-97638931d38e)
+
+
 ### Client Requirements
 
 The client UI will have the following routes:
