@@ -5,6 +5,7 @@ import { config } from "dotenv";
 import cors from "cors";
 import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
+import postRouter from "./routes/postRoutes.js"
 // import fileUpload from "express-fileupload";
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/post", postRouter);
 
 dbConnection();
 
