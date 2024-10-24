@@ -6,7 +6,7 @@ import multer from 'multer';
 
 // Configure MinIO client
 const minioClient = new Client({
-  endPoint: '10.100.201.32',
+  endPoint: '10.100.200.133',
   port: 9000,
   useSSL: false,
   accessKey: 'minioadmin',
@@ -27,6 +27,23 @@ const handleFileUpload = async (file) => {
   }
 };
 
+// Helper function to handle code snippet as file
+const handleCodeSnippet = async (codeSnippet, fileExtension) => {
+  if (!codeSnippet) {
+    throw new ErrorHandler("Code snippet cannot be empty", 400);
+  }
+  
+  try {
+    const uniqueFileName = `${Date.now()}-snippet.${fileExtension}`;
+    const buffer = Buffer.from(codeSnippet);
+    await minioClient.putObject('test', uniqueFileName, buffer);
+    return `minio://test/${uniqueFileName}`;
+  } catch (error) {
+    console.error("Error during file creation/upload:", error);
+    throw new ErrorHandler("Code snippet file creation failed", 500);
+  }
+};
+
 // Get all posts (not expired)
 export const getAllPosts = catchAsyncErrors(async (req, res, next) => {
   const posts = await Post.find({ expired: false });
@@ -36,22 +53,52 @@ export const getAllPosts = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Create a new post with file support
+// Create a new post with mutually exclusive file/snippet support
 export const postPost = catchAsyncErrors(async (req, res, next) => {
   upload.single('file')(req, res, async (err) => {
     if (err) {
       return next(new ErrorHandler("File upload error", 400));
     }
 
-    const { title, description, codesnippet } = req.body;
+    const { 
+      title, 
+      description, 
+      uploadType, // 'file' or 'snippet'
+      codesnippet, 
+      snippetFileType 
+    } = req.body;
 
     if (!title || !description) {
       return next(new ErrorHandler("Please fill in all the required fields", 400));
     }
 
-    let fileurl;
-    if (req.file) {
+    if (!uploadType) {
+      return next(new ErrorHandler("Please specify upload type (file or snippet)", 400));
+    }
+
+    let fileurl = null;
+
+    // Handle based on upload type
+    if (uploadType === 'file') {
+      if (!req.file) {
+        return next(new ErrorHandler("Please upload a file", 400));
+      }
       fileurl = await handleFileUpload(req.file);
+      
+    } else if (uploadType === 'snippet') {
+      if (!codesnippet || !snippetFileType) {
+        return next(new ErrorHandler("Code snippet and file type are required", 400));
+      }
+
+      // Validate file extension
+      const validExtensions = ['js', 'py', 'java', 'cpp', 'txt', 'html', 'css', 'json'];
+      if (!validExtensions.includes(snippetFileType)) {
+        return next(new ErrorHandler("Invalid file type for code snippet", 400));
+      }
+
+      fileurl = await handleCodeSnippet(codesnippet, snippetFileType);
+    } else {
+      return next(new ErrorHandler("Invalid upload type", 400));
     }
 
     const post = await Post.create({
@@ -61,7 +108,7 @@ export const postPost = catchAsyncErrors(async (req, res, next) => {
       jobPostedOn: req.body.jobPostedOn || Date.now(),
       postedBy: req.user._id,
       fileurl,
-      codesnippet,
+      codesnippet: uploadType === 'snippet' ? codesnippet : null,
     });
 
     res.status(201).json({
@@ -72,7 +119,7 @@ export const postPost = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Update post with file support
+// Update post with mutually exclusive file/snippet support
 export const updatePost = catchAsyncErrors(async (req, res, next) => {
   upload.single('file')(req, res, async (err) => {
     if (err) {
@@ -80,6 +127,12 @@ export const updatePost = catchAsyncErrors(async (req, res, next) => {
     }
 
     const { id } = req.params;
+    const { 
+      uploadType,
+      codesnippet, 
+      snippetFileType 
+    } = req.body;
+    
     let post = await Post.findById(id);
     
     if (!post) {
@@ -87,13 +140,45 @@ export const updatePost = catchAsyncErrors(async (req, res, next) => {
     }
 
     let fileurl = post.fileurl;
-    if (req.file) {
+
+    // Delete existing file if it exists
+    if (post.fileurl) {
+      const oldFilename = post.fileurl.split('/').pop();
+      try {
+        await minioClient.removeObject('test', oldFilename);
+      } catch (error) {
+        console.error('Error deleting old file:', error);
+      }
+    }
+
+    // Handle based on upload type
+    if (uploadType === 'file') {
+      if (!req.file) {
+        return next(new ErrorHandler("Please upload a file", 400));
+      }
       fileurl = await handleFileUpload(req.file);
+      
+    } else if (uploadType === 'snippet') {
+      if (!codesnippet || !snippetFileType) {
+        return next(new ErrorHandler("Code snippet and file type are required", 400));
+      }
+
+      // Validate file extension
+      const validExtensions = ['js', 'py', 'java', 'cpp', 'txt', 'html', 'css', 'json'];
+      if (!validExtensions.includes(snippetFileType)) {
+        return next(new ErrorHandler("Invalid file type for code snippet", 400));
+      }
+
+      fileurl = await handleCodeSnippet(codesnippet, snippetFileType);
     }
 
     post = await Post.findByIdAndUpdate(
       id,
-      { ...req.body, fileurl },
+      { 
+        ...req.body,
+        fileurl,
+        codesnippet: uploadType === 'snippet' ? codesnippet : null
+      },
       {
         new: true,
         runValidators: true,
@@ -108,6 +193,8 @@ export const updatePost = catchAsyncErrors(async (req, res, next) => {
     });
   });
 });
+
+// Other controller methods remain the same...
 
 // Delete a post and its associated file
 export const deletedPost = catchAsyncErrors(async (req, res, next) => {
