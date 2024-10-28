@@ -1,20 +1,15 @@
-import express from "express";
+import express from 'express';
+import { isAuthenticated } from '../middlewares/auth.js';
 import {
-  createNotification,
   getNotifications,
-  markAsReadAndDelete,
-} from "../controllers/notificationController.js";
-import { isAuthenticated } from "../middlewares/auth.js";
+  markAsRead,
+  deleteNotification
+} from '../controllers/notificationController.js';
 
 const router = express.Router();
 
-// Route to create a notification when a user posts
-router.post("/notify", isAuthenticated, createNotification);
-
-// Route to get all notifications for the authenticated user
-router.get("/getall", isAuthenticated, getNotifications);
-
-// Route to mark a specific notification as read and delete it from the user's view
-router.delete("/delete/:notificationId", isAuthenticated, markAsReadAndDelete);
+router.get('/', isAuthenticated, getNotifications);
+router.put('/:id/read', isAuthenticated, markAsRead);
+router.delete('/:id', isAuthenticated, deleteNotification);
 
 export default router;

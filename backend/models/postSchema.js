@@ -10,7 +10,7 @@ const postSchema = new mongoose.Schema({
     description: {
         type: String,
         required: [true, "Please provide decription."],
-        minLength: [30, "Description must contain at least 30 Characters!"],
+        minLength: [2, "Description must contain at least 2 Characters!"],
         maxLength: [500, "Description cannot exceed 500 Characters!"],
       },
     expired: {
