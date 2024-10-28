@@ -18,7 +18,7 @@ const Register = () => {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:4000/api/v1/user/register",
+        "http://localhost:4000/api/v1/user/signup",
         { name, email, password },
         {
           headers: {

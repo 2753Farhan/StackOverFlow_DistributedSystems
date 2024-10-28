@@ -12,7 +12,7 @@ function SinglePost() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const { data } = await api.get(`post/post/my/${id}`);
+        const { data } = await api.get(`post/${id}`);
         console.log("Fetched post data:", data.post); // Debug log
         setPost(data.post);
         setLoading(false);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BellIcon, XCircleIcon } from '@heroicons/react/24/solid';
 import api from '../utils/api';
+import { Link } from 'react-router-dom';
 
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
@@ -28,12 +29,16 @@ function Notifications() {
   };
 
   return (
+    
     <div className="max-w-lg mx-auto mt-8">
       {notifications.length === 0 ? (
         <p className="text-center text-gray-500">No notifications available</p>
       ) : (
         notifications.map((notification) => (
-          <div
+          <Link
+                to={`/post/others/${notification.post._id}`}
+              >
+                <div
             key={notification._id}
             className="flex items-start p-4 mb-4 bg-white shadow rounded-lg border border-gray-200"
           >
@@ -64,7 +69,9 @@ function Notifications() {
               <XCircleIcon className="h-6 w-6" />
             </button>
           </div>
-        ))
+
+              </Link>
+                  ))
       )}
     </div>
   );

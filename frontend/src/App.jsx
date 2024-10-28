@@ -16,6 +16,8 @@ import SinglePost from "./components/Post/SinglePost"; // Updated import
 import CreatePost from "./components/Post/CreatePost";
 import Notifications from "./components/Notifications/Notifications";
 import SingleOtherPost from "./components/Post/SingleOtherPost";
+import AllPosts from "./components/Post/AllPosts";
+
 
 const App = () => {
   const { isAuthorized, setIsAuthorized, setUser } = useContext(Context);
@@ -48,9 +50,10 @@ const App = () => {
           <Route path="/" element={<Home />} />
           
           {/* New routes for posts */}
+          <Route path="/post" element={<AllPosts />} />
           <Route path="/posts/own" element={<OwnPosts />} />
           <Route path="/posts/others" element={<OtherPosts />} />
-          <Route path="/post/my/:id" element={<SinglePost />} /> {/* For user's single post */}
+          <Route path="/post/:id" element={<SinglePost />} /> {/* For user's single post */}
           <Route path="/post/others/:id" element={<SingleOtherPost />} /> {/* For other's single post */}
           
           {/* Route to create a new post */}

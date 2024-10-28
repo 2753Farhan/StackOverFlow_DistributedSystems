@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.get('/', isAuthenticated, getNotifications);
-router.put('/:id/read', isAuthenticated, markAsRead);
+// router.put('/:id/read', isAuthenticated, markAsRead);
 router.delete('/:id', isAuthenticated, deleteNotification);
 
 export default router;

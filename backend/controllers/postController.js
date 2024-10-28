@@ -27,6 +27,16 @@ export const getOtherPosts = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+
+
+export const getPosts = catchAsyncErrors(async (req, res, next) => {
+  const posts = await Post.find();
+
+  res.status(200).json({
+    success: true,
+    posts,
+  });
+});
 // Controller to get a single post by the logged-in user
 export const getMySinglePost = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
@@ -43,6 +53,21 @@ export const getMySinglePost = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+
+export const getSinglePost = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  
+  const post = await Post.findOne({ _id: id });
+
+  if (!post) {
+    return next(new ErrorHandler("Post not found or you are not the author", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    post,
+  });
+});
 // Controller to get a single post by others (not created by the logged-in user)
 export const getOtherSinglePost = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
